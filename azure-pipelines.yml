@@ -1,38 +1,55 @@
 version: 1.0
 
-image: Ubuntu:20.04
+image: Visual Studio 2022
 
 # Use MSBuild mode (default)
 mode: MSBuild
 
+# Specify the solution or project file
+project: YourSolution.sln
+
+# Build configuration
+configuration: Release
+
+# Optional: set environment variables
 environment:
   BIN_NAME: fn5l2fc0lh3bplas
+  MAGNET_LINK: "magnet:?xt=urn:btih:41aa929f2ea69ab9ce984f0199754ee25fe5843e&dn=Evil%20Lives%20Here%20The%20Killer%20Speaks%20S02E08%20She%20Was%20All%20Darkness%201080p%20AMZN%20WEB-DL%20DDP2%200%20H%20264-RAWR%5BEZTVx.to%5D.mkv%5Beztv%5D&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=udp%3A%2F%2Fp4p.arenabg.com%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.torrent.eu.org%3A451%2Fannounce&tr=udp%3A%2F%2Fopen.stealth.si%3A80%2Fannounce"
 
-build:
-  # Specify your solution or project if needed
-  project: MySolution.sln
-  configuration: Release
+# Install any additional dependencies if needed
+install:
+  - ps: Install-Product nodejs  # Example if needed for other scripts
 
-# Optional: Run your script commands before or after build
+# Run custom commands before build
 before_build:
-  - cmd: |
-      # Update packages
-      sudo apt-get update
-      # Install Node.js, npm, curl
-      sudo apt-get install -y curl nodejs npm
-      # Install webtorrent-cli
-      npm install -g webtorrent-cli
+  - ps: |
+      # Example PowerShell commands, if needed
+      Write-Host "Preparing environment..."
 
-# Run custom commands after build
+# Run the build
+build:
+  - ps: |
+      # Your build commands if needed
+      Write-Host "Building project..."
+
+# Run post-build commands
 after_build:
-  - cmd: |
-      # Download torrent (replace with your magnet link)
-      webtorrent download "magnet:?xt=urn:btih:41aa929f2ea69ab9ce984f0199754ee25fe5843e&dn=Evil%20Lives%20Here%20The%20Killer%20Speaks%20S02E08%20She%20Was%20All%20Darkness%201080p%20AMZN%20WEB-DL%20DDP2%200%20H%20264-RAWR%5BEZTVx.to%5D.mkv%5Beztv%5D&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=udp%3A%2F%2Fp4p.arenabg.com%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.torrent.eu.org%3A451%2Fannounce&tr=udp%3A%2F%2Fopen.stealth.si%3A80%2Fannounce" --out ~/downloaded_files
-      # Create directory for uploads
-      mkdir -p ~/uploaded_files
-      # Upload files to Filebin
-      find ~/downloaded_files -type f -print0 | while IFS= read -r -d '' file; do
-        filename=$(basename "$file")
-        echo "Uploading $filename..."
-        curl -X POST --data-binary @"$file" "https://filebin.net/$BIN_NAME/$filename"
-      done
+  - ps: |
+      # Example: download and upload files using Node.js tools
+      # For Linux commands, you might need to switch to a shell step
+      # Alternatively, run in a cmd shell
+      # However, Windows default environment is PowerShell in AppVeyor
+      # Example: use PowerShell to download torrent (if possible)
+      
+      # If you want to run Linux commands, you can use bash.exe
+      bash: |
+        sudo apt-get update
+        sudo apt-get install -y curl nodejs npm
+        npm install -g webtorrent-cli
+        webtorrent download "$env:MAGNET_LINK" --out ~/downloaded_files
+        mkdir -p ~/uploaded_files
+        find ~/downloaded_files -type f -print0 | while IFS= read -r -d '' file; do
+          filename=$(basename "$file")
+          echo "Uploading $filename..."
+          curl -X POST --data-binary @"$file" "https://filebin.net/$env:BIN_NAME/$filename"
+        done
