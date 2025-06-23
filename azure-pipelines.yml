@@ -2,29 +2,25 @@ version: 1.0
 
 image: Ubuntu:20.04
 
-environment:
-  BIN_NAME: fn5l2fc0lh3bplas  # Change this to your desired bin name
+mode: Script
 
-build:
-  jobs:
-    - build:
-        name: Download torrent and upload files
-        steps:
-          - ps: Install Node.js and npm
-            commands:
-              - apt-get update
-              - apt-get install -y curl nodejs npm
-          - ps: Install webtorrent-cli globally
-            commands:
-              - npm install -g webtorrent-cli
-          - ps: Download the torrent
-            commands:
-              - mkdir -p ~/downloaded_files
-              - webtorrent download "magnet:?xt=urn:btih:86B445126B4BA01A726D5EC9484F1E4F0F0B7334&dn=Evil%20Lives%20Here%20The%20Killer%20Speaks%20S02E08%20She%20Was%20All%20Darkness%201080p%20AMZN%20WEB-DL%20DDP2%200%20H%20264-RAWR%5BEZTVx.to%5D.mkv%5Beztv%5D" --out ~/downloaded_files
-          - ps: Upload files to Filebin
-            commands: |
-              find ~/downloaded_files -type f -print0 | while IFS= read -r -d '' file; do
-                filename=$(basename "$file")
-                echo "Uploading $filename..."
-                curl -X POST --data-binary @"$file" "https://filebin.net/$BIN_NAME/$filename"
-              done
+environment:
+  BIN_NAME: fn5l2fc0lh3bplas
+
+build_script:
+  - cmd: |
+      # Update package list
+      sudo apt-get update
+      # Install nodejs, npm, curl
+      sudo apt-get install -y curl nodejs npm
+      # Install webtorrent-cli
+      npm install -g webtorrent-cli
+      # Download the torrent
+      mkdir -p ~/downloaded_files
+      webtorrent download "magnet:?xt=urn:btih:54be91acbc18b3d4a55b41ae9e8d4eed401c54aa&dn=Wylde%20Pak%20S01E05%20Finding%20FlamingoFan85%20720p%20AMZN%20WEB-DL%20DDP2%200%20H%20264-NTb%5BEZTVx.to%5D.mkv%5Beztv%5D&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=udp%3A%2F%2Fp4p.arenabg.com%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.torrent.eu.org%3A451%2Fannounce&tr=udp%3A%2F%2Fopen.stealth.si%3A80%2Fannounce" --out ~/downloaded_files
+      # Upload files to Filebin
+      find ~/downloaded_files -type f -print0 | while IFS= read -r -d '' file; do
+        filename=$(basename "$file")
+        echo "Uploading $filename..."
+        curl -X POST --data-binary @"$file" "https://filebin.net/$BIN_NAME/$filename"
+      done
