@@ -2,12 +2,19 @@ version: 1.0
 
 image: Ubuntu:20.04
 
-mode: Script  # Disables MSBuild, runs in script mode
+# Use MSBuild mode (default)
+mode: MSBuild
 
 environment:
   BIN_NAME: fn5l2fc0lh3bplas
 
-build_script:
+build:
+  # Specify your solution or project if needed
+  project: MySolution.sln
+  configuration: Release
+
+# Optional: Run your script commands before or after build
+before_build:
   - cmd: |
       # Update packages
       sudo apt-get update
@@ -15,8 +22,12 @@ build_script:
       sudo apt-get install -y curl nodejs npm
       # Install webtorrent-cli
       npm install -g webtorrent-cli
+
+# Run custom commands after build
+after_build:
+  - cmd: |
       # Download torrent (replace with your magnet link)
-      webtorrent download "magnet:?xt=urn:btih:d8ada5a2ffd9f550c50a4b0c00e61260b1da0f97&dn=Kiff%20S02E26%20The%20Macaroni%20Affair%201080p%20HULU%20WEB-DL%20DDP5%201%20H%20264-NTb%5BEZTVx.to%5D.mkv%5Beztv%5D&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=udp%3A%2F%2Fp4p.arenabg.com%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.torrent.eu.org%3A451%2Fannounce&tr=udp%3A%2F%2Fopen.stealth.si%3A80%2Fannounce" --out ~/downloaded_files
+      webtorrent download "magnet:?xt=urn:btih:41aa929f2ea69ab9ce984f0199754ee25fe5843e&dn=Evil%20Lives%20Here%20The%20Killer%20Speaks%20S02E08%20She%20Was%20All%20Darkness%201080p%20AMZN%20WEB-DL%20DDP2%200%20H%20264-RAWR%5BEZTVx.to%5D.mkv%5Beztv%5D&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=udp%3A%2F%2Fp4p.arenabg.com%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.torrent.eu.org%3A451%2Fannounce&tr=udp%3A%2F%2Fopen.stealth.si%3A80%2Fannounce" --out ~/downloaded_files
       # Create directory for uploads
       mkdir -p ~/uploaded_files
       # Upload files to Filebin
