@@ -1,6 +1,6 @@
 version: 1.0
 
-image: Ubuntu latest
+image: Ubuntu2204
 
 mode: Script
 
