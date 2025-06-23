@@ -1,8 +1,5 @@
 # semaphore.yml
-# Note: Adjust this file to match your Semaphore CI version and syntax
-
-# Remove 'version: "2.0"' if your Semaphore CI does not support it
-
+version: 1
 blocks:
   - name: Download Torrents and Upload to Filebin
     task:
