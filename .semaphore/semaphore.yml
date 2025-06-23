@@ -1,5 +1,5 @@
 # semaphore.yml for Semaphore CI v1 with Ubuntu environment
-version: 1
+version: v1.0
 
 name: Download Torrents and Upload to Filebin
 
