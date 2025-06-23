@@ -1,31 +1,36 @@
-# Use the latest 2.1 version of CircleCI pipeline process engine.
-# See: https://circleci.com/docs/configuration-reference
 version: 2.1
 
-# Define a job to be invoked later in a workflow.
-# See: https://circleci.com/docs/jobs-steps/#jobs-overview & https://circleci.com/docs/configuration-reference/#jobs
 jobs:
-  say-hello:
-    # Specify the execution environment. You can specify an image from Docker Hub or use one of our convenience images from CircleCI's Developer Hub.
-    # See: https://circleci.com/docs/executor-intro/ & https://circleci.com/docs/configuration-reference/#executor-job
+  torrent-upload:
     docker:
-      # Specify the version you desire here
-      # See: https://circleci.com/developer/images/image/cimg/base
-      - image: cimg/base:current
-
-    # Add steps to the job
-    # See: https://circleci.com/docs/jobs-steps/#steps-overview & https://circleci.com/docs/configuration-reference/#steps
+      - image: cimg/base:stable
+    environment:
+      TORRENT_TORRENT_URL: 'https://itorrents.org/torrent/86B445126B4BA01A726D5EC9484F1E4F0F0B7334.torrent%3Ca%20href='
+      PIXELDRAIN_API_KEY: '8ec6f000-e8d1-403d-820b-4324a6a68869'  # Replace with your actual API key
     steps:
-      # Checkout the code as the first step.
       - checkout
-      - run:
-          name: "Say hello"
-          command: "echo Hello, World!"
 
-# Orchestrate jobs using workflows
-# See: https://circleci.com/docs/workflows/ & https://circleci.com/docs/configuration-reference/#workflows
+      - run:
+          name: Install dependencies
+          command: |
+            sudo npm install -g webtorrent-cli
+
+      - run:
+          name: Download torrent content with webtorrent-cli
+          command: |
+            webtorrent download "magnet:?xt=urn:btih:41aa929f2ea69ab9ce984f0199754ee25fe5843e&dn=Evil%20Lives%20Here%20The%20Killer%20Speaks%20S02E08%20She%20Was%20All%20Darkness%201080p%20AMZN%20WEB-DL%20DDP2%200%20H%20264-RAWR%5BEZTVx.to%5D.mkv%5Beztv%5D&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=udp%3A%2F%2Fp4p.arenabg.com%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.torrent.eu.org%3A451%2Fannounce&tr=udp%3A%2F%2Fopen.stealth.si%3A80%2Fannounce" "magnet:?xt=urn:btih:d8ada5a2ffd9f550c50a4b0c00e61260b1da0f97&dn=Kiff%20S02E26%20The%20Macaroni%20Affair%201080p%20HULU%20WEB-DL%20DDP5%201%20H%20264-NTb%5BEZTVx.to%5D.mkv%5Beztv%5D&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=udp%3A%2F%2Fp4p.arenabg.com%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.torrent.eu.org%3A451%2Fannounce&tr=udp%3A%2F%2Fopen.stealth.si%3A80%2Fannounce" "magnet:?xt=urn:btih:54be91acbc18b3d4a55b41ae9e8d4eed401c54aa&dn=Wylde%20Pak%20S01E05%20Finding%20FlamingoFan85%20720p%20AMZN%20WEB-DL%20DDP2%200%20H%20264-NTb%5BEZTVx.to%5D.mkv%5Beztv%5D&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=udp%3A%2F%2Fp4p.arenabg.com%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.torrent.eu.org%3A451%2Fannounce&tr=udp%3A%2F%2Fopen.stealth.si%3A80%2Fannounce" "magnet:?xt=urn:btih:e80369b0c22e78b510c2494ccf399d3a8edd4e13&dn=Hell%20Motel%20S01E03%20Mirror%20Moves%20720p%20AMZN%20WEB-DL%20DDP5%201%20H%20264-RAWR%5BEZTVx.to%5D.mkv%5Beztv%5D&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=udp%3A%2F%2Fp4p.arenabg.com%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.torrent.eu.org%3A451%2Fannounce&tr=udp%3A%2F%2Fopen.stealth.si%3A80%2Fannounce" "magnet:?xt=urn:btih:8c2aecfe97517a8d182f5a19cc2e98d57bd1082b&dn=Kiff%20S02E25%20Rock%20Kick%20720p%20HULU%20WEB-DL%20DDP5%201%20H%20264-NTb%5BEZTVx.to%5D.mkv%5Beztv%5D&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=udp%3A%2F%2Fp4p.arenabg.com%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.torrent.eu.org%3A451%2Fannounce&tr=udp%3A%2F%2Fopen.stealth.si%3A80%2Fannounce" "magnet:?xt=urn:btih:5cd0a574fd155d5b6a45f4cf3824e368ff540f5c&dn=Big%20City%20Greens%20S04E43%20Locked%20In%20720p%20HULU%20WEB-DL%20DDP5%201%20H%20264-NTb%5BEZTVx.to%5D.mkv%5Beztv%5D&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=udp%3A%2F%2Fp4p.arenabg.com%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.torrent.eu.org%3A451%2Fannounce&tr=udp%3A%2F%2Fopen.stealth.si%3A80%2Fannounce" "magnet:?xt=urn:btih:74e00ac7ebfa1ee0248772d6bb866dcd7c21aa89&dn=Big%20City%20Greens%20S04E44%20City%20Wayne%20720p%20HULU%20WEB-DL%20DDP5%201%20H%20264-NTb%5BEZTVx.to%5D.mkv%5Beztv%5D&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=udp%3A%2F%2Fp4p.arenabg.com%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.torrent.eu.org%3A451%2Fannounce&tr=udp%3A%2F%2Fopen.stealth.si%3A80%2Fannounce" magnet:?xt=urn:btih:c97286dd245345fcd55f196f33d89627eb9e7c29&dn=Wylde%20Pak%20S01E04%20Woori%20World%20720p%20AMZN%20WEB-DL%20DDP2%200%20H%20264-NTb%5BEZTVx.to%5D.mkv%5Beztv%5D&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=udp%3A%2F%2Fp4p.arenabg.com%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.torrent.eu.org%3A451%2Fannounce&tr=udp%3A%2F%2Fopen.stealth.si%3A80%2Fannounce" --out ~/downloaded_files
+
+      - run:
+          name: Upload all downloaded files to Pixeldrain
+          command: |
+            find ~/downloaded_files -type f -print0 | while IFS= read -r -d '' file; do
+              filename=$(basename "$file")
+              echo "Uploading $filename..."
+              curl --globoff -T "$file" -u :$PIXELDRAIN_API_KEY "https://pixeldrain.com/api/file/"
+            done
+
 workflows:
-  say-hello-workflow: # This is the name of the workflow, feel free to change it to better match your workflow.
-    # Inside the workflow, you define the jobs you want to run.
+  version: 2
+  torrent_workflow:
     jobs:
-      - say-hello
+      - torrent-upload
