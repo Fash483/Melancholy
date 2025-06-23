@@ -1,44 +1,36 @@
-name: Torrent Download
+name: Torrent Download & Upload to Pixeldrain
 
 on:
   push:
     branches:
       - main
-    paths:
-      - torrents/**   # Path where torrent files will be uploaded
+  workflow_dispatch:
 
 jobs:
-  download:
+  torrent-upload:
     runs-on: ubuntu-latest
+    env:
+      TORRENT_URL: 'magnet:?xt=urn:btih:27f160798a82e23608607455eb4064309c99dd63&dn=Unknown%20Serial%20Killers%20of%20America%20S01E06%20Herb%20Baumeister%20720p%20AMZN%20WEB-DL%20DDP2%200%20H%20264-RAWR%5BEZTVx.to%5D.mkv%5Beztv%5D&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=udp%3A%2F%2Fp4p.arenabg.com%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.torrent.eu.org%3A451%2Fannounce&tr=udp%3A%2F%2Fopen.stealth.si%3A80%2Fannounce' # Your magnet link here
 
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v3
 
-    - name: Install Deluge
-      run: |
-        sudo apt update
-        sudo apt install -y deluged deluge-web deluge-console
+      - name: Install torrentp
+        run: |
+          pip install torrentp
 
-    - name: Run Deluge Daemon
-      run: |
-        # Start the Deluge daemon (this might require specific configuration)
-        deluged &
-        sleep 10  # Wait for the Deluge daemon to start
+      - name: Download torrent files
+        run: |
+          torrentp $TORRENT_URL --output ./downloaded_files
 
-    - name: Configure No Seed
-      run: |
-        deluge-console config -s seeding_time 0
-        echo "Set seeding_time to 0 to disable seeding."
-
-    - name: Add Torrent
-      run: |
-        # Add the torrent(s) to Deluge
-        for torrent in torrents/*.torrent; do
-          deluge-console add "magnet:?xt=urn:btih:34F2A1FA5CD593C394C6E5B5B83B92A7165EA9A9&dn=Learn+Python+In+A+Week+And+Master+It&tr=udp%3A%2F%2Fopen.tracker.cl%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=udp%3A%2F%2F9.rarbg.com%3A2810%2Fannounce&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A6969%2Fannounce&tr=udp%3A%2F%2Fexodus.desync.com%3A6969%2Fannounce&tr=http%3A%2F%2Ftracker.openbittorrent.com%3A80%2Fannounce&tr=udp%3A%2F%2Fwww.torrent.eu.org%3A451%2Fannounce&tr=udp%3A%2F%2Ftracker1.bt.moack.co.kr%3A80%2Fannounce&tr=udp%3A%2F%2Ftracker.torrent.eu.org%3A451%2Fannounce&tr=udp%3A%2F%2Ftracker.tiny-vps.com%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.pomf.se%3A80%2Fannounce&tr=udp%3A%2F%2Ftracker.moeking.me%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.loadbt.com%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.dler.org%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=http%3A%2F%2Ftracker.openbittorrent.com%3A80%2Fannounce&tr=udp%3A%2F%2Fopentracker.i2p.rocks%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.internetwarriors.net%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969%2Fannounce&tr=udp%3A%2F%2Fcoppersurfer.tk%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.zer0day.to%3A1337%2Fannounce"
-        done
-
-    - name: Stop Deluge Daemon
-      run: |
-        # Properly stop the Deluge daemon
-        deluge-console quit
+      - name: Upload files to Pixeldrain
+        run: |
+          for file in ./downloaded_files/*; do
+            filename=$(basename "$file")
+            echo "Uploading $filename..."
+            response=$(curl -s -F "file=@$file" https://pixeldrain.com/api/file)
+            # Parse the response to get the download link
+            url=$(echo $response | grep -oP '(?<="download_url":")[^"]+')
+            echo "File uploaded: $url"
+          done
