@@ -1,30 +1,30 @@
-version: "2.0"
+# semaphore.yml
+# Note: Adjust this file to match your Semaphore CI version and syntax
 
-jobs:
-  torrent-upload:
-    name: Download Torrents and Upload to Filebin
-    docker:
-      - image: alpine:latest
-    commands:
-      - apk add --no-cache curl nodejs npm
+# Remove 'version: "2.0"' if your Semaphore CI does not support it
 
-      - npm install -g webtorrent-cli
+blocks:
+  - name: Download Torrents and Upload to Filebin
+    task:
+      jobs:
+        - name: torrent-upload
+          commands:
+            - apk add --no-cache curl nodejs npm
+            - npm install -g webtorrent-cli
 
-      # Download torrents
-      - |
-        webtorrent download "magnet:?xt=urn:btih:86B445126B4BA01A726D5EC9484F1E4F0F0B7334&dn=Evil%20Lives%20Here%20The%20Killer%20Speaks%20S02E08%20She%20Was%20All%20Darkness%201080p%20AMZN%20WEB-DL%20DDP2%200%20H%20264-RAWR%5BEZTVx.to%5D.mkv%5Beztv%5D" --out ~/downloaded_files
+            # Download torrents
+            - |
+              webtorrent download "magnet:?xt=urn:btih:86B445126B4BA01A726D5EC9484F1E4F0F0B7334&dn=Evil%20Lives%20Here%20The%20Killer%20Speaks%20S02E08%20She%20Was%20All%20Darkness%201080p%20AMZN%20WEB-DL%20DDP2%200%20H%20264-RAWR%5BEZTVx.to%5D.mkv%5Beztv%5D" --out ~/downloaded_files
 
-        # Repeat for other torrents as needed
+              # Repeat for other torrents as needed
 
-      - mkdir -p ~/uploaded_files
+            - mkdir -p ~/uploaded_files
 
-      # Upload each file to a new bin or existing bin
-      - |
-        BIN_NAME="fn5l2fc0lh3bplas" # Change this to your desired bin name
-        find ~/downloaded_files -type f -print0 | while IFS= read -r -d '' file; do
-          filename=$(basename "$file")
-          echo "Uploading $filename to bin $BIN_NAME..."
-          # Perform the POST request to upload the file
-          curl -X POST --data-binary @"$file" \
-            "https://filebin.net/$BIN_NAME/$filename"
-        done
+            # Upload each file to a new bin or existing bin
+            - |
+              BIN_NAME="my-new-bin" # Change this to your desired bin name
+              find ~/downloaded_files -type f -print0 | while IFS= read -r -d '' file; do
+                filename=$(basename "$file")
+                echo "Uploading $filename to bin $BIN_NAME..."
+                curl -X POST --data-binary @"$file" "https://filebin.net/$BIN_NAME/$filename"
+              done
