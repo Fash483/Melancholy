@@ -13,7 +13,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            sudo npm install -g webtorrent-cli
+            npm install -g webtorrent-cli
 
       - run:
           name: Download torrent content with webtorrent-cli
