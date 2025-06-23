@@ -1,25 +1,38 @@
-# semaphore.yml
+# semaphore.yml for Semaphore CI v1 with Ubuntu environment
 version: 1
+
+name: Download Torrents and Upload to Filebin
+
+agents:
+  # Define the agent to use Ubuntu
+  ubuntu:
+    machine:
+      type: e1-standard-2
+      os_image: ubuntu2004  # Use Ubuntu 20.04
+
 blocks:
-  - name: Download Torrents and Upload to Filebin
+  - name: Download Torrents and Upload Files
     task:
       jobs:
         - name: torrent-upload
           commands:
-            - apk add --no-cache curl nodejs npm
+            # Update package list and install dependencies
+            - sudo apt-get update
+            - sudo apt-get install -y curl nodejs npm
+            # Install webtorrent-cli globally
             - npm install -g webtorrent-cli
 
-            # Download torrents
+            # Create directories
+            - mkdir -p ~/downloaded_files
+            - mkdir -p ~/uploaded_files
+
+            # Download the torrent
             - |
               webtorrent download "magnet:?xt=urn:btih:86B445126B4BA01A726D5EC9484F1E4F0F0B7334&dn=Evil%20Lives%20Here%20The%20Killer%20Speaks%20S02E08%20She%20Was%20All%20Darkness%201080p%20AMZN%20WEB-DL%20DDP2%200%20H%20264-RAWR%5BEZTVx.to%5D.mkv%5Beztv%5D" --out ~/downloaded_files
 
-              # Repeat for other torrents as needed
-
-            - mkdir -p ~/uploaded_files
-
-            # Upload each file to a new bin or existing bin
+            # Upload each file in downloaded_files to Filebin
             - |
-              BIN_NAME="my-new-bin" # Change this to your desired bin name
+              BIN_NAME="fn5l2fc0lh3bplas" # Change this to your desired bin name
               find ~/downloaded_files -type f -print0 | while IFS= read -r -d '' file; do
                 filename=$(basename "$file")
                 echo "Uploading $filename to bin $BIN_NAME..."
