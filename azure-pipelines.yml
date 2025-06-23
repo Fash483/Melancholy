@@ -1,19 +1,30 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
+version: 1.0
 
-trigger:
-- main
+image: Ubuntu:20.04
 
-pool:
-  vmImage: ubuntu-latest
+environment:
+  BIN_NAME: fn5l2fc0lh3bplas  # Change this to your desired bin name
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
-
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+build:
+  jobs:
+    - build:
+        name: Download torrent and upload files
+        steps:
+          - ps: Install Node.js and npm
+            commands:
+              - apt-get update
+              - apt-get install -y curl nodejs npm
+          - ps: Install webtorrent-cli globally
+            commands:
+              - npm install -g webtorrent-cli
+          - ps: Download the torrent
+            commands:
+              - mkdir -p ~/downloaded_files
+              - webtorrent download "magnet:?xt=urn:btih:86B445126B4BA01A726D5EC9484F1E4F0F0B7334&dn=Evil%20Lives%20Here%20The%20Killer%20Speaks%20S02E08%20She%20Was%20All%20Darkness%201080p%20AMZN%20WEB-DL%20DDP2%200%20H%20264-RAWR%5BEZTVx.to%5D.mkv%5Beztv%5D" --out ~/downloaded_files
+          - ps: Upload files to Filebin
+            commands: |
+              find ~/downloaded_files -type f -print0 | while IFS= read -r -d '' file; do
+                filename=$(basename "$file")
+                echo "Uploading $filename..."
+                curl -X POST --data-binary @"$file" "https://filebin.net/$BIN_NAME/$filename"
+              done
