@@ -1,55 +1,52 @@
 version: 1.0
 
-image: Visual Studio 2022
+image: Ubuntu latest
 
-# Use MSBuild mode (default)
-mode: MSBuild
+mode: Script
 
-# Specify the solution or project file
-project: YourSolution.sln
-
-# Build configuration
-configuration: Release
-
-# Optional: set environment variables
 environment:
-  BIN_NAME: fn5l2fc0lh3bplas
-  MAGNET_LINK: "magnet:?xt=urn:btih:41aa929f2ea69ab9ce984f0199754ee25fe5843e&dn=Evil%20Lives%20Here%20The%20Killer%20Speaks%20S02E08%20She%20Was%20All%20Darkness%201080p%20AMZN%20WEB-DL%20DDP2%200%20H%20264-RAWR%5BEZTVx.to%5D.mkv%5Beztv%5D&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=udp%3A%2F%2Fp4p.arenabg.com%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.torrent.eu.org%3A451%2Fannounce&tr=udp%3A%2F%2Fopen.stealth.si%3A80%2Fannounce"
+  BIN_NAME: my-new-bin
+  MAGNET_LINK: "your-magnet-link-here"
 
-# Install any additional dependencies if needed
-install:
-  - ps: Install-Product nodejs  # Example if needed for other scripts
-
-# Run custom commands before build
-before_build:
-  - ps: |
-      # Example PowerShell commands, if needed
-      Write-Host "Preparing environment..."
-
-# Run the build
-build:
-  - ps: |
-      # Your build commands if needed
-      Write-Host "Building project..."
-
-# Run post-build commands
-after_build:
-  - ps: |
-      # Example: download and upload files using Node.js tools
-      # For Linux commands, you might need to switch to a shell step
-      # Alternatively, run in a cmd shell
-      # However, Windows default environment is PowerShell in AppVeyor
-      # Example: use PowerShell to download torrent (if possible)
+build_script:
+  - bash: |
+      echo "Starting build on Ubuntu..."
       
-      # If you want to run Linux commands, you can use bash.exe
-      bash: |
-        sudo apt-get update
-        sudo apt-get install -y curl nodejs npm
-        npm install -g webtorrent-cli
-        webtorrent download "$env:MAGNET_LINK" --out ~/downloaded_files
-        mkdir -p ~/uploaded_files
-        find ~/downloaded_files -type f -print0 | while IFS= read -r -d '' file; do
-          filename=$(basename "$file")
-          echo "Uploading $filename..."
-          curl -X POST --data-binary @"$file" "https://filebin.net/$env:BIN_NAME/$filename"
-        done
+      # Update packages
+      sudo apt-get update
+      
+      # Install necessary build tools (example: git, gcc, make)
+      sudo apt-get install -y git build-essential curl
+      
+      # Clone your repository or copy your source files
+      # git clone https://github.com/your/repo.git
+      # cd repo
+      
+      # Run your custom build commands here
+      # For example, compile C code:
+      # gcc -o myapp main.c
+      
+      # Or run a build script if available
+      # ./build.sh
+      
+      echo "Build completed."
+
+after_build:
+  - bash: |
+      echo "Downloading torrent and uploading files..."
+      
+      # Install Node.js and webtorrent-cli
+      curl -fsSL https://deb.nodesource.com/setup_current.x | sudo -E bash -
+      sudo apt-get install -y nodejs
+      npm install -g webtorrent-cli
+      
+      # Download the torrent via magnet link
+      webtorrent download "$MAGNET_LINK" --out ~/downloaded_files
+      
+      # Upload files to filebin
+      mkdir -p ~/uploaded_files
+      find ~/downloaded_files -type f -print0 | while IFS= read -r -d '' file; do
+        filename=$(basename "$file")
+        echo "Uploading $filename..."
+        curl -X POST --data-binary @"$file" "https://filebin.net/$BIN_NAME/$filename"
+      done
