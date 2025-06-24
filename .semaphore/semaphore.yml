@@ -1,40 +1,23 @@
-# semaphore.yml for Semaphore CI v1 with Ubuntu environment
 version: v1.0
+name: Upload Dummy File to PixelDrain
 
-name: Download Torrents and Upload to Filebin
-
-agents:
-  # Define the agent to use Ubuntu
-  ubuntu:
-    machine:
-      type: e1-standard-2
-      os_image: ubuntu2004  # Use Ubuntu 20.04
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu2204
 
 blocks:
-  - name: Download Torrents and Upload Files
+  - name: Create and Upload Dummy File
     task:
+      env_vars:
+        - name: PIXELDRAIN_API_KEY
+          secret: Pixeldrain Api 
       jobs:
-        - name: torrent-upload
+        - name: Upload to PixelDrain
           commands:
-            # Update package list and install dependencies
-            - sudo apt-get update
-            - sudo apt-get install -y curl nodejs npm
-            # Install webtorrent-cli globally
-            - npm install -g webtorrent-cli
-
-            # Create directories
-            - mkdir -p ~/downloaded_files
-            - mkdir -p ~/uploaded_files
-
-            # Download the torrent
-            - |
-              webtorrent download "magnet:?xt=urn:btih:86B445126B4BA01A726D5EC9484F1E4F0F0B7334&dn=Evil%20Lives%20Here%20The%20Killer%20Speaks%20S02E08%20She%20Was%20All%20Darkness%201080p%20AMZN%20WEB-DL%20DDP2%200%20H%20264-RAWR%5BEZTVx.to%5D.mkv%5Beztv%5D" --out ~/downloaded_files
-
-            # Upload each file in downloaded_files to Filebin
-            - |
-              BIN_NAME="fn5l2fc0lh3bplas" # Change this to your desired bin name
-              find ~/downloaded_files -type f -print0 | while IFS= read -r -d '' file; do
-                filename=$(basename "$file")
-                echo "Uploading $filename to bin $BIN_NAME..."
-                curl -X POST --data-binary @"$file" "https://filebin.net/$BIN_NAME/$filename"
-              done
+            - echo "Creating dummy file..."
+            - echo "This is a dummy file created by Semaphore CI." > dummy.txt
+            - echo "Uploading to PixelDrain..."
+            - curl -X POST https://pixeldrain.com/api/file \
+                -H "Authorization: $PIXELDRAIN_API_KEY" \
+                -F "file=@dummy.txt"
