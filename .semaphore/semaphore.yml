@@ -22,7 +22,7 @@ blocks:
             - echo "📦 Installing webtorrent-cli..."
             - sudo apt update
             - sudo apt install -y nodejs npm
-            - sudo npm install -g webtorrent-cli
+            - npm install webtorrent-cli
 
             - echo "📥 Downloading torrent..."
             - mkdir downloads
