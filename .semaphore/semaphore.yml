@@ -1,11 +1,6 @@
 version: v1.0
 name: Upload Dummy File to PixelDrain
 
-agent:
-  machine:
-    type: e1-standard-2
-    os_image: ubuntu2204
-
 blocks:
   - name: Create and Upload Dummy File
     task:
