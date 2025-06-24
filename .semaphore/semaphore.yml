@@ -6,18 +6,19 @@ agent:
     type: e1-standard-2
     os_image: ubuntu2204
 
+secrets:
+  - name: Pixeldrain Api
+  
 blocks:
   - name: Create and Upload Dummy File
     task:
-      env_vars:
-        - name: PIXELDRAIN_API_KEY
-          secret: Pixeldrain Api 
       jobs:
         - name: Upload to PixelDrain
           commands:
             - echo "Creating dummy file..."
             - echo "This is a dummy file created by Semaphore CI." > dummy.txt
             - echo "Uploading to PixelDrain..."
-            - curl -X POST https://pixeldrain.com/api/file \
+            - |
+              curl -X POST https://pixeldrain.com/api/file \
                 -H "Authorization: $PIXELDRAIN_API_KEY" \
                 -F "file=@dummy.txt"
