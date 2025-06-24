@@ -6,9 +6,6 @@ agent:
     type: e1-standard-2
     os_image: ubuntu2204
 
-secrets:
-  - name: Pixeldrain Api
-  
 blocks:
   - name: Create and Upload Dummy File
     task:
@@ -20,5 +17,5 @@ blocks:
             - echo "Uploading to PixelDrain..."
             - |
               curl -X POST https://pixeldrain.com/api/file \
-                -H "Authorization: $PIXELDRAIN_API_KEY" \
+                -H "Authorization: 8ec6f000-e8d1-403d-820b-4324a6a68869" \
                 -F "file=@dummy.txt"
